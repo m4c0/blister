@@ -1,9 +1,19 @@
 from os import getcwd
 
+import platform
 import subprocess
 import sys
 
 from . import compile_commands, config, ninja, outputs, sources, templates, timing
+
+def _is_osx():
+    return platform.system() == 'Darwin'
+
+def _is_linux():
+    return platform.system() == 'Linux'
+
+def _is_windows():
+    return platform.system() == 'Windows'
 
 def scan_and_compile(f, ext):
     cfg = config.cached
@@ -48,7 +58,12 @@ def _list_srcs(app, exts):
     for ext in exts:
         yield from sources.list(app.rell, ext)
         yield from sources.list_recursive(ext, './sources/common/')
-        yield from sources.list('sources/osx-metal', ext)
+        if _is_osx():
+            yield from sources.list('sources/osx-metal', ext)
+        elif _is_linux():
+            yield from sources.list('sources/linux', ext)
+        elif _is_windows():
+            yield from sources.list('sources/windows', ext)
 
 def create_infoplist(file):
     out = "{0}/{1}.app/Contents".format(file.fold, file.base)
@@ -90,8 +105,12 @@ def link_app(f, file, app_stmt):
     app_stmt.add_dependency(out)
 
 def link_metal(f, file, app_stmt):
+    metal_objs = [src.objf for src in _list_srcs(file, [ 'metal' ])]
+    if len(metal_objs) == 0:
+        return
+
     out = "{0}/{1}.app/Contents/Resources/default.metallib".format(file.fold, file.base)
-    ins = ' '.join([src.objf for src in _list_srcs(file, [ 'metal' ])])
+    ins = ' '.join(metal_objs)
     stmt = ninja.BuildStatement(out, 'link-metal', ins)
     stmt.write(f)
 
@@ -106,9 +125,10 @@ def _gen_build_ninja(f):
     for k, v in cfg.get('variables', {}).items():
         f.write('{0} = {1}\n'.format(k, v))
 
-    f.write('sdkpath = ')
-    f.write(_get_sdk_root())
-    f.write('\n')
+    if _is_osx():
+        f.write('isysroot = -isysroot ')
+        f.write(_get_sdk_root())
+        f.write('\n')
 
     templates.write_preamble(f)
 

@@ -6,7 +6,6 @@ _preamble = '''
 cstd = -std=gnu++2a
 includes = -I{cwd}/includes -I/usr/local/include
 modules = -fmodules -fprebuilt-module-path={build}/modules -fmodules-cache-path={build}/modules
-isysroot = -isysroot $sdkpath
 
 app_ldflags = -fobjc-arc -fobjc-link-runtime -lpng -lz \
   -framework AppKit \
