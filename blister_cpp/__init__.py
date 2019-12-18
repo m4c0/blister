@@ -100,7 +100,7 @@ def link_app(f, file, app_stmt):
     if _is_osx():
         out = "{0}/{1}.app/Contents/MacOS/{1}".format(file.fold, file.base)
     else:
-        out = "{0}/{1}".format(file.fold, file.base)
+        out = "{0}/{1}/{1}".format(file.fold, file.base)
     ins = ' '.join([src.objf for src in _list_srcs(file, [ 'cpp', 'cppm', 'mm' ])])
     stmt = ninja.BuildStatement(out, 'link-app', ins, vars=vars)
     stmt.write(f)
