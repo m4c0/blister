@@ -97,7 +97,10 @@ def link_app(f, file, app_stmt):
     cfg = config.cached
 
     vars = cfg.get(file.fold, {}).get(file.base, {}).get('variables', {})
-    out = "{0}/{1}.app/Contents/MacOS/{1}".format(file.fold, file.base)
+    if _is_osx():
+        out = "{0}/{1}.app/Contents/MacOS/{1}".format(file.fold, file.base)
+    else:
+        out = "{0}/{1}".format(file.fold, file.base)
     ins = ' '.join([src.objf for src in _list_srcs(file, [ 'cpp', 'cppm', 'mm' ])])
     stmt = ninja.BuildStatement(out, 'link-app', ins, vars=vars)
     stmt.write(f)
@@ -130,6 +133,9 @@ def _gen_build_ninja(f):
         f.write(_get_sdk_root())
         f.write('\n')
 
+        f.write('app_ldflags = -mmacosx-version-min=10.14.0 -fobjc-arc -fobjc-link-runtime -lpng -lz ')
+        f.write('-framework AppKit -framework AudioToolbox -framework Metal -framework MetalKit\n')
+
     templates.write_preamble(f)
 
     # TODO: Use SPIR-V or similar to convert between shader variants
@@ -146,10 +152,12 @@ def _gen_build_ninja(f):
         app_stmt = ninja.BuildPhonyStatement(file.base)
         app_stmt.add_dependency('modules')
 
-        create_infoplist(file)
+        if _is_osx():
+            create_infoplist(file)
+            link_metal(f, file, app_stmt)
+
         copy_images(f, file, app_stmt)
         copy_resources(f, file, app_stmt)
-        link_metal(f, file, app_stmt)
         link_app(f, file, app_stmt)
 
         app_stmt.write_default(f)

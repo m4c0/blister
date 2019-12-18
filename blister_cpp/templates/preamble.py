@@ -7,14 +7,8 @@ cstd = -std=gnu++2a
 includes = -I{cwd}/includes -I/usr/local/include
 modules = -fmodules -fprebuilt-module-path={build}/modules -fmodules-cache-path={build}/modules
 
-app_ldflags = -fobjc-arc -fobjc-link-runtime -lpng -lz \
-  -framework AppKit \
-  -framework AudioToolbox \
-  -framework Metal \
-  -framework MetalKit
-
 run_clang = $clang $cflags $cstd $includes $isysroot
-run_linker = $linker $ldflags -mmacosx-version-min=10.14.0
+run_linker = $linker $ldflags
 
 rule cpp2o
   depfile = $out.d
