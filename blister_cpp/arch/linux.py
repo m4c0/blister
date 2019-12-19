@@ -3,5 +3,8 @@ class Spec:
         self.folder = 'linux'
         self.ninja_preamble = ''
 
+    def bundle_folder(self, file):
+        return "{0}/{1}-prefix".format(file.fold, file.base)
+
     def output_exe(self, file):
-        return "{0}/{1}-prefix/bin/{1}".format(file.fold, file.base)
+        return "bin/{0}".format(file.base)

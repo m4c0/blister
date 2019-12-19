@@ -88,7 +88,7 @@ def link_app(f, file, app_stmt):
     cfg = config.cached
 
     vars = cfg.get(file.fold, {}).get(file.base, {}).get('variables', {})
-    out = spec.output_exe(file)
+    out = '{0}/{1}'.format(spec.bundle_folder(file), spec.output_exe(file))
     ins = ' '.join([src.objf for src in _list_srcs(file, [ 'cpp', 'cppm', 'mm' ])])
     stmt = ninja.BuildStatement(out, 'link-app', ins, vars=vars)
     stmt.write(f)
@@ -133,7 +133,8 @@ def _gen_build_ninja(f):
 
         if _is_osx():
             create_infoplist(file)
-            link_metal(f, file, app_stmt)
+
+        link_metal(f, file, app_stmt)
 
         copy_images(f, file, app_stmt)
         copy_resources(f, file, app_stmt)

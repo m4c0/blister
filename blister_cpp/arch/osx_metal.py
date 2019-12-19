@@ -23,5 +23,8 @@ class Spec:
         self.folder = 'osx-metal'
         self.ninja_preamble = preamble.format(_get_sdk_root())
 
+    def bundle_folder(self, file):
+        return "{0}/{1}.app/Contents".format(file.fold, file.base)
+
     def output_exe(self, file):
-        return "{0}/{1}.app/Contents/MacOS/{1}".format(file.fold, file.base)
+        return "MacOS/{0}".format(file.base)
