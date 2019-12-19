@@ -3,7 +3,7 @@ from os import getcwd
 from .. import outputs
 
 _preamble = '''
-cstd = -std=gnu++2a
+cstd = -std=c++2a
 includes = -I{cwd}/includes -I/usr/local/include
 modules = -fmodules -fprebuilt-module-path={build}/modules -fmodules-cache-path={build}/modules
 
