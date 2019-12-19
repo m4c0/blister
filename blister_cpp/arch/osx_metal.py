@@ -21,6 +21,7 @@ class Spec:
     '''
     def __init__(self):
         self.folder = 'osx-metal'
+        self.includes = ['/usr/local/include']
         self.ninja_preamble = preamble.format(_get_sdk_root())
 
     def bundle_folder(self, file):

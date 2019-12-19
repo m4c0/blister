@@ -107,6 +107,16 @@ def link_metal(f, file, app_stmt):
 
     app_stmt.add_dependency(out)
 
+def _gen_includes(f):
+    f.write('includes = -I{cwd}/includes/common -I{cwd}/includes/{platform}'.format(
+        cwd=getcwd(),
+        platform=spec.folder,
+    ))
+    for folder in spec.includes:
+        f.write(' -I' + folder)
+
+    f.write('\n')
+
 def _gen_build_ninja(f):
     cfg = config.cached
 
@@ -114,6 +124,7 @@ def _gen_build_ninja(f):
         f.write('{0} = {1}\n'.format(k, v))
 
     f.write(spec.ninja_preamble)
+    _gen_includes(f)
 
     templates.write_preamble(f)
 

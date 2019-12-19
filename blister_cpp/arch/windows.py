@@ -1,6 +1,7 @@
 class Spec:
     def __init__(self):
         self.folder = 'windows'
+        self.includes = []
         self.ninja_preamble = ''
 
     def bundle_folder(self, file):

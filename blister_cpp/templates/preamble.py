@@ -1,10 +1,7 @@
-from os import getcwd
-
 from .. import outputs
 
 _preamble = '''
 cstd = -std=c++2a
-includes = -I{cwd}/includes -I/usr/local/include
 modules = -fmodules -fprebuilt-module-path={build}/modules -fmodules-cache-path={build}/modules
 
 run_clang = $clang $cflags $cstd $includes $isysroot
@@ -62,4 +59,4 @@ rule link-metal
 '''
 
 def write(f):
-    f.write(_preamble.format(cwd=getcwd(), build=outputs.get_filename('')))
+    f.write(_preamble.format(build=outputs.get_filename('')))
