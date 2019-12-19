@@ -107,22 +107,13 @@ def link_metal(f, file, app_stmt):
 
     app_stmt.add_dependency(out)
 
-def _get_sdk_root():
-    return subprocess.run(['xcrun', '--show-sdk-path'], capture_output=True).stdout.decode('utf-8')
-
 def _gen_build_ninja(f):
     cfg = config.cached
 
     for k, v in cfg.get('variables', {}).items():
         f.write('{0} = {1}\n'.format(k, v))
 
-    if _is_osx():
-        f.write('isysroot = -isysroot ')
-        f.write(_get_sdk_root())
-        f.write('\n')
-
-        f.write('app_ldflags = -mmacosx-version-min=10.14.0 -fobjc-arc -fobjc-link-runtime -lpng -lz ')
-        f.write('-framework AppKit -framework AudioToolbox -framework Metal -framework MetalKit\n')
+    f.write(spec.ninja_preamble)
 
     templates.write_preamble(f)
 

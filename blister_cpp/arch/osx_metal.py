@@ -1,3 +1,17 @@
+import subprocess
+
+preamble = '''
+isysroot = -isysroot {0}
+app_ldflags = -mmacosx-version-min=10.14.0 -fobjc-arc -fobjc-link-runtime -lpng -lz \
+    -framework AppKit \
+    -framework AudioToolbox \
+    -framework Metal \
+    -framework MetalKit
+'''
+
+def _get_sdk_root():
+    return subprocess.run(['xcrun', '--show-sdk-path'], capture_output=True).stdout.decode('utf-8')
+
 class Spec:
     '''
     Defines the platform-specific specs for building to OSX using Metal. The
@@ -7,6 +21,7 @@ class Spec:
     '''
     def __init__(self):
         self.folder = 'osx-metal'
+        self.ninja_preamble = preamble.format(_get_sdk_root())
 
     def output_exe(self, file):
         return "{0}/{1}.app/Contents/MacOS/{1}".format(file.fold, file.base)
