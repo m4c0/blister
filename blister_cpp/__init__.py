@@ -4,16 +4,12 @@ import platform
 import subprocess
 import sys
 
-from . import compile_commands, config, ninja, outputs, sources, templates, timing
+from . import arch, compile_commands, config, ninja, outputs, sources, templates, timing
+
+spec = arch.create_platform_specs()
 
 def _is_osx():
     return platform.system() == 'Darwin'
-
-def _is_linux():
-    return platform.system() == 'Linux'
-
-def _is_windows():
-    return platform.system() == 'Windows'
 
 def scan_and_compile(f, ext):
     cfg = config.cached
@@ -58,12 +54,7 @@ def _list_srcs(app, exts):
     for ext in exts:
         yield from sources.list(app.rell, ext)
         yield from sources.list_recursive(ext, './sources/common/')
-        if _is_osx():
-            yield from sources.list('sources/osx-metal', ext)
-        elif _is_linux():
-            yield from sources.list('sources/linux', ext)
-        elif _is_windows():
-            yield from sources.list('sources/windows', ext)
+        yield from sources.list('./sources/' + spec.folder, ext)
 
 def create_infoplist(file):
     out = "{0}/{1}.app/Contents".format(file.fold, file.base)
@@ -97,10 +88,7 @@ def link_app(f, file, app_stmt):
     cfg = config.cached
 
     vars = cfg.get(file.fold, {}).get(file.base, {}).get('variables', {})
-    if _is_osx():
-        out = "{0}/{1}.app/Contents/MacOS/{1}".format(file.fold, file.base)
-    else:
-        out = "{0}/{1}/{1}".format(file.fold, file.base)
+    out = spec.output_exe(file)
     ins = ' '.join([src.objf for src in _list_srcs(file, [ 'cpp', 'cppm', 'mm' ])])
     stmt = ninja.BuildStatement(out, 'link-app', ins, vars=vars)
     stmt.write(f)
