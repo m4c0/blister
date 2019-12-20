@@ -21,7 +21,7 @@ setuptools.setup(
         "Operating System :: MacOS :: MacOS X",
     ],
     install_requires=[
-        "PyYAML>=5.1.2"
+        "PyYAML>=5.1.1"
     ],
     scripts=[
         "bin/bli"
