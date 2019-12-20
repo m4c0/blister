@@ -1,3 +1,5 @@
+from os import getcwd
+
 import subprocess
 
 preamble = '''
@@ -23,6 +25,9 @@ class Spec:
         self.folder = 'osx-metal'
         self.includes = ['/usr/local/include']
         self.ninja_preamble = preamble.format(_get_sdk_root())
+
+    def root(self):
+        return getcwd() 
 
     def bundle_folder(self, file):
         return "{0}/{1}.app/Contents".format(file.fold, file.base)

@@ -1,7 +1,11 @@
-from os import getcwd, makedirs
+from os import makedirs
+
+from . import arch
+
+root = arch.create_platform_specs().root()
 
 def get_filename(file):
-    return '{0}/build/{1}'.format(getcwd(), file)
+    return '{0}/build/{1}'.format(root, file)
 
 def create_file(file):
     return open(get_filename(file), 'w')

@@ -1,7 +1,11 @@
 import re, os
 
+from . import arch
+
 _import_re = re.compile('(?:export )?import ([A-Za-z0-9._]+);')
 _export_re = re.compile('export module ([A-Za-z0-9._]+);')
+
+root = arch.create_platform_specs().root()
 
 def _list_imports(file):
     with open(file) as f:
@@ -31,7 +35,7 @@ class Match:
     def __init__(self, folder, file):
         self.fold = folder
         self.rell = '{0}/{1}'.format(folder, file)
-        self.full = '{0}/{1}/{2}'.format(os.getcwd(), folder, file)
+        self.full = '{0}/{1}/{2}'.format(root, folder, file)
         (self.base, ext) = os.path.splitext(file)
         if ext not in ['', '.png']:
             self.objf = '{0}.o'.format(self.rell)

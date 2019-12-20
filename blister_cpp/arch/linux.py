@@ -1,8 +1,13 @@
+from os import getcwd
+
 class Spec:
     def __init__(self):
         self.folder = 'linux'
         self.includes = ['/usr/local/include']
         self.ninja_preamble = ''
+
+    def root(self):
+        return getcwd() 
 
     def bundle_folder(self, file):
         return "{0}/{1}-prefix".format(file.fold, file.base)
