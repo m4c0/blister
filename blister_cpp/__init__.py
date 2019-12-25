@@ -40,6 +40,7 @@ def scan_and_compile_modules(f):
 def _list_modules(app):
     yield app
     yield from sources.list_recursive('cppm', './sources/common/')
+    yield from sources.list('./sources/' + spec.folder, 'cppm')
 
 def scan_and_link_singles(f, folder, ext):
     cfg = config.cached
