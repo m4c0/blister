@@ -20,11 +20,15 @@ def scan_and_compile(f, ext):
         stmt = ninja.BuildStatement(file.objf, ext + '2o', file.full, deps=file.deps, vars=vars)
         stmt.write(f)
 
+def _list_modules():
+    yield from sources.list_recursive('cppm', './sources/common/')
+    yield from sources.list('./sources/' + spec.folder, 'cppm')
+
 def scan_and_compile_modules(f):
     modules = ninja.BuildPhonyStatement('modules')
     
     cfg = config.cached
-    for file in sources.list_recursive('cppm'):
+    for file in _list_modules():
         vars_1 = cfg.get(file.fold, {}).get('variables', {})
         vars_2 = cfg.get(file.fold, {}).get(file.base, {}).get('variables', {})
         vars = { **vars_1, **vars_2 }
@@ -37,17 +41,16 @@ def scan_and_compile_modules(f):
 
     modules.write_default(f)
 
-def _list_modules(app):
+def _list_modules_for_app(app):
     yield app
-    yield from sources.list_recursive('cppm', './sources/common/')
-    yield from sources.list('./sources/' + spec.folder, 'cppm')
+    yield from _list_modules()
 
 def scan_and_link_singles(f, folder, ext):
     cfg = config.cached
     for file in sources.list(folder, ext):
         vars = cfg.get(folder, {}).get(file.base, {}).get('variables', {})
         out = "{0}/{1}".format(folder, file.base)
-        ins = ' '.join([src.objf for src in _list_modules(file)])
+        ins = ' '.join([src.objf for src in _list_modules_for_app(file)])
         stmt = ninja.BuildStatement(out, 'link', ins, file.deps, vars)
         stmt.write_default(f)
 
